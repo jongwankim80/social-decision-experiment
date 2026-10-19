@@ -8,7 +8,7 @@ service cloud.firestore {
       function isResearcher() {
         return request.auth != null
           && request.auth.token.firebase.sign_in_provider == 'google.com'
-          && request.auth.uid in ['REPLACE_WITH_RESEARCHER_GOOGLE_UID'];
+          && request.auth.uid in ['4lw2iMco3uMSscJ2Earrdao5KeU2'];
       }
 
       allow get, list: if isResearcher();
