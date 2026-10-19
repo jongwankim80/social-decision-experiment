@@ -6,9 +6,9 @@
   <meta name="robots" content="noindex, nofollow" />
   <meta name="theme-color" content="#f7f8fa" />
   <title>Social Decision Experiment</title>
-  <link rel="stylesheet" href="./assets/styles.css" />
-  <script src="./config.js" defer></script>
-  <script type="module" src="./assets/app.js"></script>
+  <link rel="stylesheet" href="./assets/styles.css?v=5" />
+  <script src="./config.js?v=5" defer></script>
+  <script type="module" src="./assets/app.js?v=5"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -64,15 +64,43 @@
         </form>
       </section>
 
+
+      <section id="contact-view" class="panel contact-panel" hidden>
+        <div class="intro-kicker">30 / 30 · TASK COMPLETE</div>
+        <h1>참가자 보상을 위한 연락처 입력</h1>
+        <p class="intro-lead">모든 시나리오에 응답하셨습니다. 참가자 보상을 희망하시면 휴대전화 번호를 입력해 주세요. 연락처 입력은 선택사항이며, 입력하지 않아도 실험 응답을 제출할 수 있습니다.</p>
+        <form id="compensation-form" class="compensation-form" novalidate>
+          <label class="contact-input-label" for="compensation-phone">휴대전화 번호</label>
+          <input id="compensation-phone" class="contact-phone-input" type="tel" inputmode="tel" autocomplete="off" maxlength="24" placeholder="010-1234-5678" aria-describedby="compensation-privacy" />
+          <p class="contact-phone-help">보상 안내에 사용할 수 있는 본인 연락처를 입력해 주세요.</p>
+          <div class="contact-privacy" id="compensation-privacy">
+            <h2>개인정보 수집·이용 안내</h2>
+            <p><strong>수집 항목:</strong> 휴대전화 번호</p>
+            <p><strong>이용 목적:</strong> 참가자 보상 안내 및 지급</p>
+            <p><strong>보유 기간:</strong> 보상 지급 완료 후 30일 이내 삭제 (연구자가 직접 삭제)</p>
+            <p><strong>동의 거부:</strong> 연락처 제공에 동의하지 않아도 연구 응답은 제출할 수 있지만, 보상 연락은 받기 어렵습니다.</p>
+            <p class="contact-privacy-footnote">연락처는 실험 평정 및 행동 선택 데이터와 별도 저장되며, 참가자 ID와 정서 응답은 연락처 문서에 포함하지 않습니다.</p>
+          </div>
+          <label class="contact-agree-label"><input id="compensation-consent" type="checkbox" /><span>위 개인정보 수집·이용에 동의합니다.</span></label>
+          <p class="notice notice-error" id="compensation-error" role="alert" hidden></p>
+          <div class="contact-actions">
+            <button type="button" class="btn btn-outline" id="skip-contact">연락처 없이 제출</button>
+            <button type="submit" class="btn btn-primary" id="contact-next" disabled>다음으로 <span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+      </section>
+
       <section id="finish-view" class="panel finish-panel" hidden>
         <div class="finish-icon" aria-hidden="true">✓</div>
         <h1>모든 문항에 응답했습니다.</h1>
         <p class="intro-lead" id="finish-description">제출 준비가 완료되었습니다.</p>
+        <p class="contact-finish-note" id="finish-contact-note" hidden></p>
         <p class="notice notice-preview" id="finish-preview-notice" hidden>현재는 미리보기 모드입니다. 연구 서버에 데이터가 저장되지 않습니다. 테스트 응답을 JSON 파일로 내려받아 확인할 수 있습니다.</p>
         <p class="notice notice-error" id="submit-error" role="alert" hidden></p>
         <div class="finish-actions">
           <button type="button" class="btn btn-primary" id="submit-btn">응답 제출하기 <span aria-hidden="true">→</span></button>
           <button type="button" class="btn btn-outline" id="export-btn">테스트 데이터 내려받기</button>
+          <button type="button" class="btn btn-outline" id="edit-contact-btn" hidden>연락처 수정</button>
         </div>
         <p class="finish-footnote">제출 완료 메시지가 나타나기 전까지 브라우저를 닫지 마세요.</p>
       </section>

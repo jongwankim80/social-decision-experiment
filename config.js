@@ -6,6 +6,9 @@ window.EXPERIMENT_CONFIG = {
   experimentId: 'social-decision-v1',
   experimentVersion: '1.0.0',
   submissionsEnabled: true,
+  // DO NOT turn on until compensation_contacts rules are PUBLISHED in Firebase Console.
+  // Confirm privacy retention practice before enabling.
+  compensationEnabled: false,
   firebase: {
     apiKey: 'AIzaSyDJ1tVMIjUUimJcUl-LfWqMCYhO2kJyHL4',
     authDomain: 'social-decision-experiment.firebaseapp.com',

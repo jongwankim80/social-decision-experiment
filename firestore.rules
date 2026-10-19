@@ -49,5 +49,35 @@ service cloud.firestore {
         && request.resource.data.totalDurationMs is int
         && request.resource.data.totalDurationMs >= 0;
     }
+
+    // Compensation contact data live in a different collection from trial ratings.
+    // The contact document holds no anonymous auth UID and no trial responses.
+    match /experiments/social-decision-v1/compensation_contacts/{contactId} {
+      function isResearcher() {
+        return request.auth != null
+          && request.auth.token.firebase.sign_in_provider == 'google.com'
+          && request.auth.uid in ['4lw2iMco3uMSscJ2Earrdao5KeU2'];
+      }
+
+      allow get, list: if isResearcher();
+      allow update, delete: if false;
+      allow create: if request.auth != null
+        && request.auth.token.firebase.sign_in_provider == 'anonymous'
+        && request.resource.data.keys().hasAll([
+          'phone', 'consented', 'consentVersion', 'experimentId', 'submittedAt'
+        ])
+        && request.resource.data.keys().hasOnly([
+          'phone', 'consented', 'consentVersion', 'experimentId', 'submittedAt'
+        ])
+        && request.resource.data.phone is string
+        && request.resource.data.phone.matches('^(010[0-9]{8}|01[16789][0-9]{7,8})$')
+        && request.resource.data.consented == true
+        && request.resource.data.consentVersion == 'reward-phone-v1'
+        && request.resource.data.experimentId == 'social-decision-v1'
+        && request.resource.data.submittedAt == request.time
+        // Atomic batch requirement: a new complete submission from this UID must
+        // exist in the same commit. Reusing an old submission is not accepted.
+        && getAfter(/databases/$(database)/documents/experiments/social-decision-v1/submissions/$(request.auth.uid)).data.submittedAt == request.time;
+    }
   }
 }

@@ -1,4 +1,5 @@
-import { saveToFirestore } from './firebase-client.js';
+import { saveToFirestore } from './firebase-client.js?v=5';
+import { normalizeMobileNumber } from './compensation.mjs';
 
 const CONFIG = window.EXPERIMENT_CONFIG || {};
 // Separate live drafts from earlier preview runs so test answers cannot be submitted.
@@ -26,9 +27,13 @@ let activeSince = null;
 // Prevent accidental real submissions before Authentication and Firestore rules are verified.
 const isPreview = CONFIG.submissionsEnabled !== true ||
   !(CONFIG.firebase && CONFIG.firebase.apiKey && CONFIG.firebase.projectId && CONFIG.firebase.appId);
+// Contact collection stays off until its Firestore rules are published.
+const compensationEnabled = CONFIG.compensationEnabled === true && !isPreview;
+// Personal contacts are only held in memory, never in sessionStorage.
+let compensationDraft = null;
 
 function showScreen(which) {
-  for (const id of ['loading', 'welcome', 'trial', 'finish', 'success', 'error']) {
+  for (const id of ['loading', 'welcome', 'trial', 'contact', 'finish', 'success', 'error']) {
     $(id + '-view').hidden = id !== which;
   }
   currentScreen = which;
@@ -189,7 +194,7 @@ function updateCompletion() {
 }
 
 function showTrial() {
-  if (!state || state.index >= 30) { showFinish(); return; }
+  if (!state || state.index >= 30) { if (compensationEnabled) showCompensation(); else showFinish(); return; }
   showScreen('trial');
   const sc = scenarioMap.get(state.order[state.index]);
   $('trial-progress-label').textContent = String(state.index + 1).padStart(2, '0') + ' / 30';
@@ -227,8 +232,48 @@ function advance(event) {
   state.index++;
   state.draft = { emotions: {}, choice: null, activeDurationMs: 0 };
   persist();
-  if (state.index === 30) showFinish();
-  else showTrial();
+  if (state.index === 30) {
+    if (compensationEnabled) showCompensation();
+    else showFinish();
+  } else showTrial();
+}
+
+
+function updateCompensationNext() {
+  if (!compensationEnabled) return;
+  let validNumber = false;
+  try { normalizeMobileNumber($('compensation-phone').value); validNumber = true; }
+  catch { /* Validation appears only after user attempts to continue. */ }
+  $('contact-next').disabled = !(validNumber && $('compensation-consent').checked);
+}
+function showCompensation() {
+  if (!compensationEnabled || !state || state.index !== 30) return;
+  showScreen('contact');
+  $('compensation-phone').value = compensationDraft?.phone || '';
+  $('compensation-consent').checked = Boolean(compensationDraft?.consent);
+  $('compensation-error').hidden = true;
+  updateCompensationNext();
+}
+function finishCompensation(event) {
+  event.preventDefault();
+  if (!compensationEnabled || !state || state.index !== 30) return;
+  try {
+    const phone = normalizeMobileNumber($('compensation-phone').value);
+    if (!$('compensation-consent').checked) throw new Error('보상 연락처 수집·이용에 동의해 주세요.');
+    compensationDraft = { phone, consent: true };
+    $('compensation-error').hidden = true;
+    showFinish();
+  } catch (error) {
+    $('compensation-error').textContent = error.message || '휴대전화 번호를 확인해 주세요.';
+    $('compensation-error').hidden = false;
+  }
+}
+function skipCompensation() {
+  if (!compensationEnabled || !state || state.index !== 30) return;
+  compensationDraft = null;
+  $('compensation-phone').value = '';
+  $('compensation-consent').checked = false;
+  showFinish();
 }
 
 function buildPayload() {
@@ -251,6 +296,13 @@ function showFinish() {
   $('submit-btn').textContent = isPreview ? '미리보기 종료' : '응답 제출하기 →';
   $('finish-description').textContent = isPreview ? '30개 문항을 모두 완료했습니다. 현재는 미리보기 모드입니다.' : '30개 문항을 모두 완료했습니다. 마지막으로 제출 버튼을 눌러 주세요.';
   $('submit-error').hidden = true;
+  $('finish-contact-note').hidden = !compensationEnabled;
+  $('edit-contact-btn').hidden = !compensationEnabled;
+  if (compensationEnabled) {
+    $('finish-contact-note').textContent = compensationDraft
+      ? '보상 연락처를 입력했습니다. 최종 제출 시 실험 응답과 별도 저장됩니다.'
+      : '보상 연락처를 입력하지 않았습니다. 실험 응답은 정상적으로 제출할 수 있습니다.';
+  }
 }
 
 function exportDraft() {
@@ -275,10 +327,16 @@ async function submit() {
   $('submit-error').hidden = true;
   const button = $('submit-btn'); button.disabled = true; button.textContent = '안전하게 저장 중…';
   try {
-    await saveToFirestore(CONFIG, buildPayload());
+    await saveToFirestore(CONFIG, buildPayload(), compensationEnabled ? compensationDraft : null);
     clearSaved(); state = null;
+    $('compensation-phone').value = '';
+    $('compensation-consent').checked = false;
+    const hadContact = compensationEnabled && Boolean(compensationDraft);
+    compensationDraft = null;
     showScreen('success');
-    $('success-description').textContent = '응답이 안전하게 저장되었습니다. 참여해 주셔서 감사합니다.';
+    $('success-description').textContent = hadContact
+      ? '실험 응답과 보상 연락처가 각각 안전하게 저장되었습니다. 참여해 주셔서 감사합니다.'
+      : '응답이 안전하게 저장되었습니다. 참여해 주셔서 감사합니다.';
   } catch (error) {
     console.error('Save error:', error.code || error.name || 'unknown');
     $('submit-error').textContent = '응답이 아직 저장되지 않았습니다. 네트워크 또는 서버 설정을 확인한 후 다시 시도해 주세요. 입력한 내용은 이 탭에 임시 보관됩니다.';
@@ -297,7 +355,7 @@ async function init() {
     scenarioMap = new Map(scenarios.map(s => [s.id, s]));
     state = readSaved();
     if (validSaved(state)) {
-      if (state.index === 30) showFinish(); else showTrial();
+      if (state.index === 30) { if (compensationEnabled) showCompensation(); else showFinish(); } else showTrial();
     } else {
       state = null; clearSaved(); showScreen('welcome');
     }
@@ -310,6 +368,11 @@ async function init() {
 $('acknowledge').addEventListener('change', (e) => { $('start-btn').disabled = !e.target.checked; });
 $('start-btn').addEventListener('click', () => { state = createState(); persist(); showTrial(); });
 $('response-form').addEventListener('submit', advance);
+$('compensation-form').addEventListener('submit', finishCompensation);
+$('compensation-phone').addEventListener('input', () => { compensationDraft = null; updateCompensationNext(); });
+$('compensation-consent').addEventListener('change', () => { compensationDraft = null; updateCompensationNext(); });
+$('skip-contact').addEventListener('click', skipCompensation);
+$('edit-contact-btn').addEventListener('click', showCompensation);
 $('submit-btn').addEventListener('click', submit);
 $('export-btn').addEventListener('click', exportDraft);
 $('reload-btn').addEventListener('click', () => location.reload());

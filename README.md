@@ -15,6 +15,14 @@ An independent, randomized, browser-based class exercise (and a possible startin
 - The console never stores service account keys and never uploads raw study responses to the public GitHub repository. The updated [firestore.rules](./firestore.rules) leaves anonymous participant CREATE rules unchanged, denies updates/deletes, and grants read/list only to explicitly allowlisted **Google Firebase UIDs**.
 - A screenshot of a genuine dummy submission in the owner's Firebase Console confirms that Firestore received at least one record. **Admin read permission and blocking of unauthorized reads have not yet been verified live.**
 
+## Optional compensation contact step (staged / NOT LIVE YET)
+
+- The new **참가자 보상을 위한 연락처 입력** screen appears immediately after trial 30 **only after** the owner publishes the updated Firestore rules and enables `compensationEnabled: true`. Right now it is deliberately `false`, so existing student responses keep working without a rules mismatch.
+- Contact = optional Korean mobile phone number + explicit consent for compensation communication. Respondents can skip contact collection and still submit research responses.
+- Personal phone numbers are saved to a **separate Firestore collection** `experiments/social-decision-v1/compensation_contacts`, not inside the 30-trial records. When a number is provided, both writes are atomic; a failed write commits neither document.
+- Admin downloads compensation phone numbers separately at `contacts.html`; the research Excel/CSV does not contain phone numbers.
+- **Before switching it on:** follow [COMPENSATION_SETUP.md](./COMPENSATION_SETUP.md) and make sure the stated manual deletion within 30 days after compensation is operationally acceptable. GitHub's `firestore.rules` must be copied into Firebase Console and **Published**.
+
 ## What the student sees
 
 - One complete scenario per screen, with the 30 scenarios newly shuffled at experiment start (seed and actual order are saved).

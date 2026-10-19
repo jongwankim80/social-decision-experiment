@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <title>보상 연락처 관리 · EmoLab</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <link rel="stylesheet" href="./assets/admin.css" />
+  <link rel="stylesheet" href="./assets/contacts-admin.css" />
+  <script src="./config.js?v=5" defer></script>
+  <script type="module" src="./assets/contacts-admin.js?v=5"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <div class="site-identity"><span class="brand-mark" aria-hidden="true">E</span><span class="brand-name">EmoLab <span class="brand-divider">/</span> Research Console</span></div>
+      <span class="header-caption">Researchers only</span>
+    </header>
+    <main class="main-content admin-main">
+      <section class="panel admin-panel">
+        <div class="intro-kicker">COMPENSATION · ADMINISTRATOR</div>
+        <h1>참가자 보상 연락처 관리</h1>
+        <p class="intro-lead">보상 안내를 위해 별도로 수집한 휴대전화 번호를 확인하고 내려받습니다. 연구 응답과는 다른 Firestore 컬렉션에 저장됩니다.</p>
+        <p class="contact-security-note">개인정보를 다루는 페이지입니다. 다운로드한 파일은 연구실 승인 저장소에만 보관하고 보상 지급 종료 후 30일 이내에 연락처 자료를 직접 삭제해 주세요.</p>
+        <div class="admin-auth-actions">
+          <button class="btn btn-primary" type="button" id="contact-admin-login" disabled>Google 계정으로 로그인</button>
+          <button class="btn btn-outline" type="button" id="contact-admin-logout" hidden>로그아웃</button>
+          <span id="contact-admin-auth" class="admin-auth-state" aria-live="polite">인증 초기화 중…</span>
+        </div>
+        <div id="contact-admin-identity" class="admin-identity" hidden><div><span class="admin-small-label">관리자 계정</span><strong id="contact-admin-email"></strong></div></div>
+        <div class="admin-divider"></div>
+        <div class="admin-control-bar">
+          <div><h2>보상 연락처</h2><p class="admin-caption">허용된 Google Firebase 관리자만 읽을 수 있습니다.</p></div>
+          <button type="button" class="btn btn-primary" id="contact-admin-load" disabled>연락처 불러오기</button>
+        </div>
+        <p id="contact-admin-message" class="admin-message" role="status" aria-live="polite">먼저 로그인해 주세요.</p>
+        <div class="admin-summary">
+          <div class="admin-stat"><span>연락처 제출</span><strong id="contact-admin-count">—</strong></div>
+          <div class="admin-stat"><span>최근 제출</span><strong id="contact-admin-newest" class="admin-stat-date">—</strong></div>
+        </div>
+        <div class="admin-export-bar">
+          <div class="admin-export-description"><strong>보상 연락처 다운로드</strong><span>실험 응답과 분리된 Excel 파일로 저장됩니다.</span></div>
+          <button type="button" class="btn btn-primary" id="contact-admin-export" disabled>Excel (.xlsx) 다운로드</button>
+        </div>
+        <h2 class="admin-table-title">최근 제출 내역 (일부 가림)</h2>
+        <div class="admin-table-wrap"><table class="admin-table"><thead><tr><th>연락처 (일부 가림)</th><th>제출 시각</th></tr></thead><tbody id="contact-admin-list"><tr><td colspan="2" class="admin-empty">연락처를 불러오면 여기에 표시됩니다.</td></tr></tbody></table></div>
+        <p class="admin-caption admin-bottom-note">연락처는 GitHub에 저장되지 않으며, 이 페이지에서는 조회와 내려받기만 가능합니다. 보상 지급이 끝나면 Firebase Console에서 연락처 문서를 삭제해 주세요.</p>
+        <p><a class="contact-back-link" href="./admin.html">← 연구 응답 관리 페이지로 돌아가기</a></p>
+      </section>
+    </main>
+    <footer class="site-footer"><span>EmoLab · Jeonbuk National University</span><span>Researcher only</span></footer>
+  </div>
+</body>
+</html>

@@ -10,3 +10,20 @@
 
 /* Anchor labels: readable at both ends of each 1–7 scale. */
 .scale-label{font-size:12px;color:#536578}
+/* Separate optional compensation step, shown after the last trial. */
+.contact-panel{max-width:800px;margin:0 auto}
+.contact-panel .intro-lead{max-width:670px}
+.compensation-form{margin-top:22px;text-align:left}
+.contact-input-label{display:block;color:#223a52;font-size:15px;font-weight:740;margin-bottom:12px}
+.contact-phone-input{width:100%;max-width:430px;border:1px solid #cbd9e4;border-radius:10px;padding:15px 16px;min-height:53px;letter-spacing:.025em;font-size:18px;color:#203449;background:#fff;font-variant-numeric:tabular-nums}
+.contact-phone-input:focus-visible{outline:3px solid #95c5e3;outline-offset:2px}
+.contact-phone-help{font-size:12px;line-height:1.7;color:#738296;margin:7px 0 20px}
+.contact-privacy{border:1px solid #dfebf3;background:#f6f9fc;border-radius:13px;padding:21px 23px;color:#475c6d}
+.contact-privacy h2{font-size:15px;color:#294359;margin:0 0 13px}
+.contact-privacy p{font-size:13px;line-height:1.8;margin:5px 0}
+.contact-privacy .contact-privacy-footnote{font-size:12px;color:#6f8190;border-top:1px solid #dfebf3;margin-top:13px;padding-top:13px}
+.contact-agree-label{display:flex;align-items:flex-start;gap:10px;margin:21px 0;font-size:14px;font-weight:630;color:#314b61;line-height:1.7}
+.contact-agree-label input{width:18px;height:18px;margin:3px 0 0;accent-color:#285d80;flex:none}
+.contact-actions{display:flex;flex-wrap:wrap;justify-content:flex-end;gap:12px;margin-top:28px}
+.contact-finish-note{max-width:580px;margin:0 auto 24px;color:#506577;font-size:13px;line-height:1.8}
+@media(max-width:600px){.contact-privacy{padding:15px}.contact-actions{flex-direction:column}.contact-actions .btn{width:100%}.contact-phone-input{max-width:none}}

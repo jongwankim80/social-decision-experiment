@@ -1,0 +1,4 @@
+.contact-security-note{border:1px solid #dfebf1;background:#f4f8fb;color:#3f5668;border-radius:11px;padding:14px 16px;line-height:1.8;font-size:13px;margin:0 0 22px}
+.contact-back-link{font-size:13px;color:#285d80;text-decoration:underline;text-underline-offset:3px}
+.contact-admin-input{font-variant-numeric:tabular-nums}
+@media(max-width:640px){.contact-security-note{padding:12px;font-size:12px}.admin-export-bar{gap:12px}}

@@ -1,3 +1,5 @@
+import { makeCompensationRecord } from './compensation.mjs';
+
 /**
  * Write-only research submissions. The browser is untrusted: Firestore Security
  * Rules, Anonymous Auth and (optionally) Firebase App Check must be configured.
@@ -91,8 +93,11 @@ async function getBackend(config) {
   return { auth, authMod, storeMod, db: storeMod.getFirestore(app) };
 }
 
-export async function saveToFirestore(config, payload) {
+export async function saveToFirestore(config, payload, compensation = null) {
   validateSubmission(payload);
+  if (compensation !== null && (config.compensationEnabled !== true || compensation.consent !== true)) {
+    throw new Error('보상 연락처 수집 설정 또는 개인정보 동의가 올바르지 않습니다.');
+  }
   const { auth, authMod, storeMod, db } = await getBackend(config);
   // The SDK reuses an existing anonymous user in this browser session.
   const user = (await authMod.signInAnonymously(auth)).user;
@@ -104,8 +109,19 @@ export async function saveToFirestore(config, payload) {
     submittedAt: storeMod.serverTimestamp()
   };
   const ref = storeMod.doc(db, 'experiments', config.experimentId, 'submissions', user.uid);
-  // Rule permits CREATE only. It never permits browser reads or overwrites.
-  await storeMod.setDoc(ref, record);
+  // A single atomic batch writes two SEPARATE documents, or neither if denied.
+  // No phone number or contact ID is included in the research submission document.
+  if (compensation !== null) {
+    const contact = makeCompensationRecord(compensation.phone, storeMod.serverTimestamp());
+    const contactRef = storeMod.doc(storeMod.collection(db, 'experiments', config.experimentId, 'compensation_contacts'));
+    const batch = storeMod.writeBatch(db);
+    batch.set(ref, record);
+    batch.set(contactRef, contact);
+    await batch.commit();
+  } else {
+    // The established no-contact research workflow remains unchanged.
+    await storeMod.setDoc(ref, record);
+  }
 
   // A shared classroom computer can now be used by a different participant.
   // If logging out fails, the successful write must still count as success.
