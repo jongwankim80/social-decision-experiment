@@ -6,7 +6,7 @@ The experiment displays **참가자 보상을 위한 연락처 입력** immediat
 
 - Purpose: participant compensation notification / delivery.
 - Collected item: **Korean mobile phone number**, and an explicit consent acknowledgement.
-- Retention notice displayed to participants: **delete within 30 days after compensation delivery is complete**. This is not automatic. The project owner must approve this actual practice and carry out the deletion manually using Firebase Console.
+- The previously proposed **30-day deletion promise has been removed**. Before activating contact collection, the project owner must establish and disclose a truthful, institutionally appropriate retention period and disposal procedure. No specific period is configured or automatically enforced in the site.
 - Contact is **optional**. Participants can decline contact collection and still submit their 30 research responses (without compensation messaging). If a number is provided, explicit consent and a valid phone number are required.
 - Only masked phone digits appear in the researcher web console; downloading the separate XLSX exposes full phone numbers and must be stored privately.
 - Research data and contact numbers go to **separate Firestore collections**, not the same submission document. The contact record contains no participant UID, name, randomization order or trial answers. Separation limits direct linkage but it does **not** guarantee mathematical anonymity: timestamps, infrastructure metadata and dataset context may still permit association.
@@ -16,13 +16,13 @@ The experiment displays **참가자 보상을 위한 연락처 입력** immediat
 1. Open the latest **firestore.rules** in this repo. Copy the entire text.
 2. Go to Firebase Console > Firestore Database > **Rules**, paste it, and **Publish**. GitHub Pages publishing **does not** update rules.
 3. Keep existing Anonymous and Google Authentication providers enabled.
-4. **Confirm the retention notice and compensation policy**, then change `compensationEnabled: false` to `true` in `config.js` (the assistant can commit this setting when informed). NEVER activate the client UI before the matching rules are published.
+4. **Decide the actual retention period and update the participant-facing privacy notice before collecting any phone numbers.** After privacy review and publishing the matching rules, change `compensationEnabled: false` to `true` in `config.js` (the assistant can commit this setting when informed). NEVER activate the client UI before the matching rules are published.
 5. Test 30 trials followed by the new phone screen. Submit an **artificial test phone number**, and confirm both collections are created:
    - `experiments/social-decision-v1/submissions/<anonymousUid>`: 30 trial responses, no phone.
    - `experiments/social-decision-v1/compensation_contacts/<randomId>`: phone, consentVersion, consented, submittedAt, experimentId; no UID or ratings.
 6. Test **skip**: after another complete 30-trial session, choose '연락처 없이 제출'. Research submission should save and **no** contact record should be created.
 7. Log in with the allowlisted Google account and use `contacts.html` to load/export compensation contacts. Anonymous users and other Google accounts must not be able to list/read contacts.
-8. Delete test contact and submission records before distributing to participants. For actual data, delete compensation contacts within the stated retention period, and use storage/transport practices approved by your institution.
+8. Delete test contact and submission records before distributing to participants. Handle any actual contact records according to the explicitly approved retention/disposal policy and the institution's secure storage and transport requirements.
 
 ## Atomic writes
 

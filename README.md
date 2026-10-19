@@ -21,7 +21,7 @@ An independent, randomized, browser-based class exercise (and a possible startin
 - Contact = optional Korean mobile phone number + explicit consent for compensation communication. Respondents can skip contact collection and still submit research responses.
 - Personal phone numbers are saved to a **separate Firestore collection** `experiments/social-decision-v1/compensation_contacts`, not inside the 30-trial records. When a number is provided, both writes are atomic; a failed write commits neither document.
 - Admin downloads compensation phone numbers separately at `contacts.html`; the research Excel/CSV does not contain phone numbers.
-- **Before switching it on:** follow [COMPENSATION_SETUP.md](./COMPENSATION_SETUP.md) and make sure the stated manual deletion within 30 days after compensation is operationally acceptable. GitHub's `firestore.rules` must be copied into Firebase Console and **Published**.
+- **Before switching it on:** follow [COMPENSATION_SETUP.md](./COMPENSATION_SETUP.md), decide and disclose a real contact-data retention/disposal policy, and copy GitHub's `firestore.rules` into Firebase Console and **Publish**. The previous 30-day deletion wording has been removed; the contact feature remains disabled until the privacy notice is complete.
 
 ## What the student sees
 
