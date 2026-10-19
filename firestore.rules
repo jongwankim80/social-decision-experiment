@@ -2,26 +2,45 @@ rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
     match /experiments/social-decision-v1/submissions/{participantId} {
-      // Responses contain research data; browser users must never read or modify them.
+      // Research responses are NEVER readable, editable or deletable from a
+      // public browser. The project owner can export using the Admin API / IAM.
       allow read, update, delete: if false;
 
-      // Each Firebase anonymous-auth identity can submit one complete response.
-      allow create: if request.auth != null
-        && request.auth.uid == participantId
-        && request.resource.data.keys().hasOnly([
+      function expectedFields() {
+        return [
           'participantId', 'experimentId', 'experimentVersion',
           'randomizationSeed', 'order', 'startedAtISO', 'completedAtISO',
           'trials', 'totalDurationMs', 'submittedAt'
-        ])
+        ];
+      }
+
+      // Only one submission document can be CREATED by each anonymous UID.
+      // Cloud Firestore rules are NOT an anti-bot mechanism: use App Check,
+      // Firebase usage monitoring and an appropriate quota before recruitment.
+      allow create: if request.auth != null
+        && request.auth.uid == participantId
+        && request.auth.token.firebase.sign_in_provider == 'anonymous'
+        && request.resource.data.keys().hasAll(expectedFields())
+        && request.resource.data.keys().hasOnly(expectedFields())
         && request.resource.data.participantId == participantId
         && request.resource.data.experimentId == 'social-decision-v1'
         && request.resource.data.experimentVersion == '1.0.0'
         && request.resource.data.submittedAt == request.time
+        && request.resource.data.randomizationSeed is int
+        && request.resource.data.randomizationSeed >= 0
+        && request.resource.data.randomizationSeed <= 4294967295
+        && request.resource.data.startedAtISO is string
+        && request.resource.data.completedAtISO is string
+        && request.resource.data.startedAtISO.size() == 24
+        && request.resource.data.completedAtISO.size() == 24
         && request.resource.data.order is list
         && request.resource.data.order.size() == 30
+        && request.resource.data.order[0] is string
         && request.resource.data.trials is list
         && request.resource.data.trials.size() == 30
-        && request.resource.data.totalDurationMs is number
+        && request.resource.data.trials[0] is map
+        && request.resource.data.trials[29] is map
+        && request.resource.data.totalDurationMs is int
         && request.resource.data.totalDurationMs >= 0;
     }
   }

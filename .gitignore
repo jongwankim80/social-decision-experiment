@@ -1,10 +1,16 @@
-# Research data, credentials, and local state must not be committed.
-*.pem
+# Research data, credentials, and local state must not be committed publicly.
+*.csv
+*.tsv
+responses/
+exports/
+output/
+outputs/
+*.sqlite
+*.db
+.env
+.env.*
 *service-account*.json
-*-private-key*.json
-*-responses.csv
-*-responses.json
-.env*
+*credentials*.json
+*adminsdk*.json
 __pycache__/
-*.pyc
 .DS_Store
