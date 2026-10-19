@@ -63,6 +63,18 @@ test('bad rating, order and decision stop export instead of skipping', () => {
   assert.throws(() => flattenRecords([fourth, fourth], scenarios), /중복/);
 });
 
+test('empty Firestore collection is valid, and researcher page must not clear empty arrays', () => {
+  const { rows, participants } = flattenRecords([], scenarios);
+  assert.deepEqual(rows, []);
+  assert.deepEqual(participants, []);
+  // Regression check for the null.length error: displayResponses() must never
+  // invoke resetData() on an empty result, because it clears loadedParticipants.
+  const adminJs = fs.readFileSync(path.join(root, 'assets', 'admin.js'), 'utf8');
+  const displayFn = adminJs.match(/function displayResponses\(participants, rows\) \{([\s\S]*?)\n\}\n\nasync function initBackend/);
+  assert.ok(displayFn, 'displayResponses implementation must remain testable');
+  assert.doesNotMatch(displayFn[1], /\bresetData\s*\(/, 'empty-state rendering must not null out response data');
+});
+
 test('UTF-8 CSV retains Korean and protects formulas', () => {
   const csv = csvText([{name:'=2+2', emotion:'분노', sample:'Hello,"world"'}], ['name','emotion','sample']);
   assert.ok(csv.startsWith('\ufeffname,emotion,sample'));

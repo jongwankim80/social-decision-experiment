@@ -94,7 +94,17 @@ function displayResponses(participants, rows) {
     values.forEach(value => {const td = document.createElement('td');td.textContent = value;tr.append(td);});
     ui.recent.append(tr);
   }
-  if (!participants.length) resetData();
+  // Zero submissions is a valid, empty result. Do NOT call resetData() here:
+  // it clears loadedParticipants/loadedRows and the caller then hits null.length.
+  if (!participants.length) {
+    const tr = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 4;
+    td.className = 'admin-empty';
+    td.textContent = '현재 저장된 응답이 없습니다. 새 테스트 응답을 제출하거나 Firestore Data에서 문서를 확인해 주세요.';
+    tr.append(td);
+    ui.recent.append(tr);
+  }
 }
 
 async function initBackend() {
@@ -203,7 +213,7 @@ async function loadResponses() {
     ui.csv.disabled = count === 0;
     ui.xlsx.disabled = count === 0;
     status(count ? `완료: ${count.toLocaleString('ko-KR')}명 × 30개 = ${loadedRows.length.toLocaleString('ko-KR')}행을 검증했습니다. 이제 내려받을 수 있습니다.` :
-      '수집된 응답이 아직 없습니다.', count ? 'success' : '');
+      '조회 성공: 현재 저장된 응답이 0건입니다. 기존 테스트 응답을 삭제하셨다면 정상입니다.', count ? 'success' : '');
   } catch (error) {
     // Log only the error and stage, never participant response payloads.
     console.error('[Research Console] 응답 불러오기 실패 · 단계:', stage, error?.code || '', error?.stack || error?.message || error);
