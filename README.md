@@ -4,7 +4,7 @@ An independent, randomized, browser-based class exercise (and a possible startin
 
 **Live site:** https://jongwankim80.github.io/social-decision-experiment/
 
-**Current state: PREVIEW until Firebase is configured.** All 30 trials work, but student data will **not** be uploaded while `config.js` has `firebase: null`. Do not distribute as a collecting survey until the backend test succeeds.
+**Current state: Firebase web configuration added; still in PREVIEW.** The provided public Firebase web app config is committed, but `config.js` intentionally sets `submissionsEnabled: false`. All 30 trials work, but student data are **not uploaded** until Anonymous Authentication, Firestore and security rules are configured and the flag is deliberately switched on. Do not distribute as a collecting survey until a live dummy-submission and access-denial test both succeed.
 
 ## What the student sees
 
@@ -19,11 +19,11 @@ An independent, randomized, browser-based class exercise (and a possible startin
 
 You need a Firebase project controlled by the research team. Creating a Firebase project and publishing its rules require project-owner permissions. **The GitHub repository is public; never put a Firebase Admin private key, a service-account JSON or identifiable student responses in it.** Firebase's *web app config* (`apiKey`, `authDomain`, `projectId`, `appId`) is intentionally public; server permissions are enforced by Firestore rules.
 
-1. Go to [Firebase Console](https://console.firebase.google.com/) and create/select a project. Choose a Firestore region appropriate to your institution's data-handling requirements.
-2. Under **Project settings → Your apps**, register a **Web** application and copy the public Firebase web configuration.
+1. In [Firebase Console](https://console.firebase.google.com/), open the already-created project **`social-decision-experiment`**. Its public Web app configuration is already committed to [`config.js`](./config.js). Choose a Firestore region appropriate to your institution's data-handling requirements; this location is difficult to change after creation.
+2. The Web app registration step is complete; no Firebase Hosting is needed because the site is already hosted on GitHub Pages.
 3. Enable **Authentication → Sign-in method → Anonymous**. In Authentication's authorized domains, check that `jongwankim80.github.io` is allowed if required for your app's sign-in configuration.
 4. Create a **Cloud Firestore** database in Native mode. In **Firestore Database → Rules**, replace the default rules with the complete text in [`firestore.rules`](./firestore.rules) and click **Publish**. **Do not** use permissive/test-mode rules when collecting real responses. These rules grant client-side **create only** for a single document with the same Firebase Anonymous Auth UID, and **deny all client reads, updates and deletes**.
-5. In [`config.js`](./config.js), replace `firebase: null` with the public `firebase: { ... }` web configuration. Keep `experimentId: 'social-decision-v1'` and `experimentVersion: '1.0.0'`, since the security rules validate those exact values. After committing, GitHub Pages deploys the change. There is **no** separate server to run.
+5. Once Anonymous Authentication and Firestore security rules have been configured and published, **deliberately change `submissionsEnabled: false` to `true`** in [`config.js`](./config.js). Keep `experimentId: 'social-decision-v1'` and `experimentVersion: '1.0.0'` unchanged: the rules validate those exact values. GitHub Pages will deploy the change. Until then, the site will remain in preview even though the Firebase web config is present.
 6. Run a **dummy submission from the public GitHub Pages URL**. Check in Firebase Console that one document appears at `experiments/social-decision-v1/submissions/{anonymousUid}` and contains 30 trials with 12 emotion scores each. Run an additional test with the same laptop after the success screen: the experiment should obtain a *new* anonymous UID (the app signs out after confirmed submission).
 7. **Verify security rules** with Firebase's Rules Playground/emulator: unauthorized public reads/list queries and updates/deletes must fail, while an authenticated anonymous user can create only a structurally valid document under their own UID. This repository's local tests do **not** replace that live security check.
 8. Remove test records from Firestore using the researcher/admin console before real data collection, as appropriate to your data-management plan.
@@ -36,6 +36,7 @@ You need a Firebase project controlled by the research team. Creating a Firebase
 window.EXPERIMENT_CONFIG = {
   experimentId: 'social-decision-v1',
   experimentVersion: '1.0.0',
+  submissionsEnabled: true,  // only after Authentication & Firestore rules are ready
   firebase: {
     apiKey: 'PUBLIC_FIREBASE_WEB_API_KEY',
     authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
@@ -90,7 +91,7 @@ CSV files and credential files are intentionally excluded by [`.gitignore`](./.g
 | `assets/app.js` | Trial presentation, seeded shuffle, validation, timing, session draft, preview export |
 | `assets/firebase-client.js` | Firestore submission via anonymous Firebase Auth; optional App Check |
 | `data/scenarios.json` | 30 complete independent scenario texts with game and condition metadata |
-| `config.js` | Public Firebase web config; `null` while still in preview |
+| `config.js` | Public Firebase web config; `submissionsEnabled: false` retains preview until safely enabled |
 | `firestore.rules` | Deny-read/deny-update/deny-delete, authenticated create-only rules |
 | `scripts/build_data.py` | Regenerate scenario JSON from the Excel source |
 | `scripts/export_submissions.py` | Authorized Firestore → wide trial-level CSV export |

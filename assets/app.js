@@ -22,7 +22,9 @@ let scenarioMap = new Map();
 let state = null;
 let currentScreen = 'loading';
 let activeSince = null;
-const isPreview = !(CONFIG.firebase && CONFIG.firebase.apiKey && CONFIG.firebase.projectId && CONFIG.firebase.appId);
+// Prevent accidental real submissions before Authentication and Firestore rules are verified.
+const isPreview = CONFIG.submissionsEnabled !== true ||
+  !(CONFIG.firebase && CONFIG.firebase.apiKey && CONFIG.firebase.projectId && CONFIG.firebase.appId);
 
 function showScreen(which) {
   for (const id of ['loading', 'welcome', 'trial', 'finish', 'success', 'error']) {

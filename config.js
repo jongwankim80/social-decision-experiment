@@ -1,18 +1,18 @@
-// These are PUBLIC Firebase web-app configuration values, never private Admin keys.
-// Keep firebase: null for PREVIEW. Configure Authentication, Firestore Rules and
-// App Check BEFORE replacing null and recruiting real participants.
+// Firebase Web App config is PUBLIC. Never store Admin credentials or exported responses here.
+// The experiment stays in PREVIEW until Authentication, Firestore and rules are ready,
+// a dummy submission has been verified, and submissionsEnabled is deliberately set to true.
 window.EXPERIMENT_CONFIG = {
   experimentId: 'social-decision-v1',
   experimentVersion: '1.0.0',
-  firebase: null,
+  submissionsEnabled: false,
+  firebase: {
+    apiKey: 'AIzaSyDJ1tVMIjUUimJcUl-LfWqMCYhO2kJyHL4',
+    authDomain: 'social-decision-experiment.firebaseapp.com',
+    projectId: 'social-decision-experiment',
+    storageBucket: 'social-decision-experiment.firebasestorage.app',
+    messagingSenderId: '225709004857',
+    appId: '1:225709004857:web:1cdf434ab4d3dd642915e8'
+  },
   // Optional public reCAPTCHA Enterprise SITE key, after App Check registration.
   appCheckSiteKey: null
-  // Example after backend setup:
-  // firebase: {
-  //   apiKey: 'PUBLIC_WEB_API_KEY',
-  //   authDomain: 'YOUR_PROJECT.firebaseapp.com',
-  //   projectId: 'YOUR_PROJECT_ID',
-  //   appId: 'YOUR_PUBLIC_WEB_APP_ID'
-  // },
-  // appCheckSiteKey: 'YOUR_RECAPTCHA_ENTERPRISE_SITE_KEY'
 };
