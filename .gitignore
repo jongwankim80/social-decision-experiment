@@ -1,0 +1,10 @@
+# Research data, credentials, and local state must not be committed.
+*.pem
+*service-account*.json
+*-private-key*.json
+*-responses.csv
+*-responses.json
+.env*
+__pycache__/
+*.pyc
+.DS_Store

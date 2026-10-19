@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#f7f8fa" />
+  <title>Social Decision Experiment</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <script src="./config.js" defer></script>
+  <script type="module" src="./assets/app.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <div class="site-identity"><span class="brand-mark" aria-hidden="true">E</span><span class="brand-name">EmoLab <span class="brand-divider">/</span> Social Decision</span></div>
+      <span class="header-caption">Behavioral Research</span>
+    </header>
+
+    <main class="main-content" id="main-content">
+      <section id="loading-view" class="panel loading-panel" aria-live="polite">
+        <span class="loading-dot" aria-hidden="true"></span>
+        <p>시나리오를 준비하고 있습니다.</p>
+      </section>
+
+      <section id="welcome-view" class="panel" hidden>
+        <div class="intro-kicker">ONLINE EXPERIMENT · 30 SCENARIOS</div>
+        <h1>사회적 의사결정 과제</h1>
+        <p class="intro-lead">다양한 상황에 놓였다고 가정하고, 그 순간의 정서와 자신의 선택을 응답해 주세요.</p>
+        <div class="intro-facts">
+          <div><strong>30</strong><span>독립적인 상황</span></div>
+          <div><strong>12</strong><span>정서 평정 항목</span></div>
+          <div><strong>1</strong><span>상황별 행동 선택</span></div>
+        </div>
+        <div class="intro-guide">
+          <h2>참여 안내</h2>
+          <p>모든 상황은 가상이며, 돈을 실제로 지급하거나 형사처벌을 하는 것은 아닙니다. 상황별로 등장하는 다른 참가자와 과거 행동 정보도 가상의 설정입니다.</p>
+          <p>각 상황에서는 먼저 12가지 정서의 강도를 평가한 뒤 행동을 선택합니다. 30개 상황은 서로 독립적이며 제시 순서는 무작위로 결정됩니다. 정답은 없습니다.</p>
+          <p>실험 도중 새로고침을 하더라도 같은 탭에서는 이어서 진행할 수 있습니다. 다만 브라우저 데이터가 삭제되거나 다른 기기를 이용하면 이어하기가 어려울 수 있습니다.</p>
+        </div>
+        <p id="preview-notice" class="notice notice-preview" hidden><strong>미리보기 모드</strong> · 아직 응답 저장 서버가 연결되지 않았습니다. 이 단계에서는 화면과 동작을 시험할 수 있지만, 응답이 연구 서버로 전송되지 않습니다.</p>
+        <label class="confirm-label"><input type="checkbox" id="acknowledge" /><span>위 안내를 읽었으며 가상 상황에 대한 응답이라는 점을 이해했습니다.</span></label>
+        <div class="intro-actions"><button type="button" class="btn btn-primary" id="start-btn" disabled>시작하기 <span aria-hidden="true">→</span></button></div>
+      </section>
+
+      <section id="trial-view" class="panel trial-panel" hidden>
+        <div class="trial-status"><span id="trial-progress-label">01 / 30</span><span id="trial-percentage">3%</span></div>
+        <div class="progress-track" aria-hidden="true"><span id="progress-fill"></span></div>
+        <article class="scenario" id="scenario-body" aria-label="의사결정 시나리오"></article>
+        <div class="section-divider"></div>
+        <h2 class="question-heading">이 상황에서 느끼는 정서를 평가해 주세요.</h2>
+        <p class="question-hint">각 정서마다 1점부터 7점까지 하나씩 선택해 주세요.</p>
+        <form id="response-form" novalidate>
+          <div id="emotion-list" class="emotion-list"></div>
+          <div class="section-divider after-emotions"></div>
+          <fieldset class="decision-block">
+            <legend id="decision-legend"></legend>
+            <div id="decision-controls" class="decision-controls"></div>
+          </fieldset>
+          <div class="form-footer">
+            <span id="response-check" class="response-check" aria-live="polite">정서를 모두 평가해 주세요.</span>
+            <button type="submit" class="btn btn-primary" id="next-btn" disabled>다음으로 <span aria-hidden="true">→</span></button>
+          </div>
+        </form>
+      </section>
+
+      <section id="finish-view" class="panel finish-panel" hidden>
+        <div class="finish-icon" aria-hidden="true">✓</div>
+        <h1>모든 문항에 응답했습니다.</h1>
+        <p class="intro-lead" id="finish-description">제출 준비가 완료되었습니다.</p>
+        <p class="notice notice-preview" id="finish-preview-notice" hidden>현재는 미리보기 모드입니다. 연구 서버에 데이터가 저장되지 않습니다. 테스트 응답을 JSON 파일로 내려받아 확인할 수 있습니다.</p>
+        <p class="notice notice-error" id="submit-error" role="alert" hidden></p>
+        <div class="finish-actions">
+          <button type="button" class="btn btn-primary" id="submit-btn">응답 제출하기 <span aria-hidden="true">→</span></button>
+          <button type="button" class="btn btn-outline" id="export-btn">테스트 데이터 내려받기</button>
+        </div>
+        <p class="finish-footnote">제출 완료 메시지가 나타나기 전까지 브라우저를 닫지 마세요.</p>
+      </section>
+
+      <section id="success-view" class="panel finish-panel" hidden>
+        <div class="finish-icon" aria-hidden="true">✓</div>
+        <h1>응답이 제출되었습니다.</h1>
+        <p class="intro-lead" id="success-description">참여해 주셔서 감사합니다.</p>
+      </section>
+
+      <section id="error-view" class="panel finish-panel" hidden>
+        <h1>실험 화면을 불러오지 못했습니다.</h1>
+        <p id="error-message">잠시 후 다시 시도해 주세요.</p>
+        <button type="button" class="btn btn-outline" id="reload-btn">새로고침</button>
+      </section>
+    </main>
+    <footer class="site-footer"><span>EmoLab · Jeonbuk National University</span><span>Social Decision Experiment v1.0</span></footer>
+  </div>
+</body>
+</html>

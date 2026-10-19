@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /experiments/social-decision-v1/submissions/{participantId} {
+      // Responses contain research data; browser users must never read or modify them.
+      allow read, update, delete: if false;
+
+      // Each Firebase anonymous-auth identity can submit one complete response.
+      allow create: if request.auth != null
+        && request.auth.uid == participantId
+        && request.resource.data.keys().hasOnly([
+          'participantId', 'experimentId', 'experimentVersion',
+          'randomizationSeed', 'order', 'startedAtISO', 'completedAtISO',
+          'trials', 'totalDurationMs', 'submittedAt'
+        ])
+        && request.resource.data.participantId == participantId
+        && request.resource.data.experimentId == 'social-decision-v1'
+        && request.resource.data.experimentVersion == '1.0.0'
+        && request.resource.data.submittedAt == request.time
+        && request.resource.data.order is list
+        && request.resource.data.order.size() == 30
+        && request.resource.data.trials is list
+        && request.resource.data.trials.size() == 30
+        && request.resource.data.totalDurationMs is number
+        && request.resource.data.totalDurationMs >= 0;
+    }
+  }
+}
