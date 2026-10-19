@@ -9,6 +9,7 @@ An independent, randomized, browser-based class exercise (and a possible startin
 ## 연구자 관리 페이지 / Researcher Console
 
 - **Admin dashboard:** https://jongwankim80.github.io/social-decision-experiment/admin.html
+- **Troubleshooting:** The dashboard identifies the failing load stage instead of reporting only a generic JavaScript error. A browser exception is different from a `permission-denied` rules rejection; see [ADMIN_SETUP.md](./ADMIN_SETUP.md).
 - **First-time setup:** [ADMIN_SETUP.md](./ADMIN_SETUP.md). One researcher Google Firebase UID is now registered in the GitHub [`firestore.rules`](./firestore.rules) allowlist. **The project owner must still copy the rules to Firebase Console and Publish them**; updating GitHub alone does not grant live database access.
 - Researchers can review submission counts and download **Excel (.xlsx)** with four sheets (Responses, Participants, Scenarios, Codebook), or a UTF-8 BOM **CSV** containing one row per participant × scenario (30 rows/person, 32 columns).
 - The console never stores service account keys and never uploads raw study responses to the public GitHub repository. The updated [firestore.rules](./firestore.rules) leaves anonymous participant CREATE rules unchanged, denies updates/deletes, and grants read/list only to explicitly allowlisted **Google Firebase UIDs**.

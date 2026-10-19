@@ -8,8 +8,8 @@
   <title>Researcher Console · Social Decision Experiment</title>
   <link rel="stylesheet" href="./assets/styles.css" />
   <link rel="stylesheet" href="./assets/admin.css" />
-  <script src="./config.js" defer></script>
-  <script type="module" src="./assets/admin.js"></script>
+  <script src="./config.js?v=2" defer></script>
+  <script type="module" src="./assets/admin.js?v=2"></script>
 </head>
 <body>
   <div class="app-shell">
@@ -37,7 +37,7 @@
             <div><span class="admin-small-label">Firebase 관리자 UID (권한 설정용)</span><code id="admin-uid"></code></div>
             <button class="btn btn-outline admin-small-button" type="button" id="admin-copy-uid">UID 복사</button>
           </div>
-          <p class="admin-caption">최초 연결 시 이 UID를 Firestore 보안 규칙의 <code>REPLACE_WITH_RESEARCHER_GOOGLE_UID</code> 자리에 지정하고 Publish해야 합니다. UID는 비밀번호가 아닙니다.</p>
+          <p class="admin-caption">관리자 UID는 GitHub의 보안 규칙에 등록되었습니다. Firebase Console → Firestore Database → 규칙(Rules)에서 최신 <a href="https://github.com/jongwankim80/social-decision-experiment/blob/main/firestore.rules" target="_blank" rel="noopener noreferrer">firestore.rules</a>를 붙여넣어 <strong>게시(Publish)</strong>해야 실제 읽기 권한이 적용됩니다.</p>
         </section>
         <div class="admin-divider"></div>
         <div class="admin-control-bar">

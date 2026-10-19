@@ -153,22 +153,33 @@ async function loadResponses() {
   resetData();
   ui.load.disabled = true;
   let records = [];
+  let stage = 'Firebase 응답 조회 준비';
   try {
     status('Firebase에서 응답을 읽는 중입니다…');
+    stage = '시나리오 메타데이터 요청';
     const scenariosResponse = await fetch('./data/scenarios.json', {cache: 'no-store'});
     if (!scenariosResponse.ok) throw new Error('시나리오 조건표를 읽지 못했습니다.');
     const scenarios = await scenariosResponse.json();
+    stage = '시나리오 메타데이터 검증';
     validateCatalog(scenarios);
     let lastDoc = null;
     let page = 0;
     const collection = storeMod.collection(db, 'experiments', CONFIG.experimentId, 'submissions');
-    // Page by document ID: uses the built-in Firestore __name__ index.
+    // Firestore implicitly orders the first page by document name.
+    // Avoid an unnecessary explicit orderBy(documentId()) in the first query.
+    // If more pages are needed, use a document snapshot as a stable cursor.
     do {
-      let queryArgs = [storeMod.orderBy(storeMod.documentId()), storeMod.limit(200)];
-      if (lastDoc) queryArgs = [storeMod.orderBy(storeMod.documentId()), storeMod.startAfter(lastDoc), storeMod.limit(200)];
+      stage = 'Firestore 문서 조회 (페이지 ' + (page + 1) + ')';
+      const queryArgs = lastDoc
+        ? [storeMod.orderBy(storeMod.documentId()), storeMod.startAfter(lastDoc), storeMod.limit(200)]
+        : [storeMod.limit(200)];
       const q = storeMod.query(collection, ...queryArgs);
       const snap = await storeMod.getDocs(q);
       if (serial !== requestNumber || auth.currentUser?.uid !== myUid) return;
+      if (!snap || !Array.isArray(snap.docs)) {
+        throw new Error('Firestore 조회 결과의 문서 목록이 올바르지 않습니다.');
+      }
+      stage = 'Firestore 문서 검증 (페이지 ' + (page + 1) + ')';
       for (const doc of snap.docs) {
         const data = doc.data();
         if (data.participantId !== doc.id) throw new Error('응답 문서 ID와 참가자 ID가 일치하지 않습니다: ' + doc.id);
@@ -180,11 +191,13 @@ async function loadResponses() {
       if (page > 100) throw new Error('응답 수가 너무 많습니다. 관리자에게 페이지당 내보내기 방식 도입을 요청해 주세요.');
     } while (lastDoc);
     // Data is not displayed or exported until every record passes validation.
+    stage = '응답 30문항 검증 및 분석용 데이터 변환';
     const flattened = flattenRecords(records, scenarios);
     if (serial !== requestNumber || auth.currentUser?.uid !== myUid) return;
     catalog = scenarios;
     loadedRows = flattened.rows;
     loadedParticipants = flattened.participants;
+    stage = '관리 화면 요약 표시';
     displayResponses(loadedParticipants, loadedRows);
     const count = loadedParticipants.length;
     ui.csv.disabled = count === 0;
@@ -192,8 +205,12 @@ async function loadResponses() {
     status(count ? `완료: ${count.toLocaleString('ko-KR')}명 × 30개 = ${loadedRows.length.toLocaleString('ko-KR')}행을 검증했습니다. 이제 내려받을 수 있습니다.` :
       '수집된 응답이 아직 없습니다.', count ? 'success' : '');
   } catch (error) {
-    if (serial === requestNumber) {resetData();status(errorMessage(error), 'error');}
-    // Intentionally avoid logging participant response payloads.
+    // Log only the error and stage, never participant response payloads.
+    console.error('[Research Console] 응답 불러오기 실패 · 단계:', stage, error?.code || '', error?.stack || error?.message || error);
+    if (serial === requestNumber) {
+      resetData();
+      status('[' + stage + '] ' + errorMessage(error), 'error');
+    }
   } finally {
     if (serial === requestNumber) ui.load.disabled = false;
     records = [];
