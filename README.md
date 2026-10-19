@@ -4,7 +4,7 @@ An independent, randomized, browser-based class exercise (and a possible startin
 
 **Live site:** https://jongwankim80.github.io/social-decision-experiment/
 
-**Current state: Firebase web configuration added; still in PREVIEW.** The provided public Firebase web app config is committed, but `config.js` intentionally sets `submissionsEnabled: false`. All 30 trials work, but student data are **not uploaded** until Anonymous Authentication, Firestore and security rules are configured and the flag is deliberately switched on. Do not distribute as a collecting survey until a live dummy-submission and access-denial test both succeed.
+**Current state: LIVE SUBMISSION SWITCH ON — PILOT TESTING ONLY.** Firebase public config is committed and `submissionsEnabled: true` is set following the project owner's report that Anonymous Authentication and Firestore Rules have been configured. **The live Firebase backend and its deployed security rules have not been independently verified. Do not share the live survey with students until a complete dummy submission appears in Firebase Console and unauthorized reads are confirmed denied.**
 
 ## What the student sees
 
@@ -23,7 +23,7 @@ You need a Firebase project controlled by the research team. Creating a Firebase
 2. The Web app registration step is complete; no Firebase Hosting is needed because the site is already hosted on GitHub Pages.
 3. Enable **Authentication → Sign-in method → Anonymous**. In Authentication's authorized domains, check that `jongwankim80.github.io` is allowed if required for your app's sign-in configuration.
 4. Create a **Cloud Firestore** database in Native mode. In **Firestore Database → Rules**, replace the default rules with the complete text in [`firestore.rules`](./firestore.rules) and click **Publish**. **Do not** use permissive/test-mode rules when collecting real responses. These rules grant client-side **create only** for a single document with the same Firebase Anonymous Auth UID, and **deny all client reads, updates and deletes**.
-5. Once Anonymous Authentication and Firestore security rules have been configured and published, **deliberately change `submissionsEnabled: false` to `true`** in [`config.js`](./config.js). Keep `experimentId: 'social-decision-v1'` and `experimentVersion: '1.0.0'` unchanged: the rules validate those exact values. GitHub Pages will deploy the change. Until then, the site will remain in preview even though the Firebase web config is present.
+5. **Completed:** `config.js` now sets `submissionsEnabled: true` following the owner's report that the Firebase services and rules are configured. `experimentId: 'social-decision-v1'` and `experimentVersion: '1.0.0'` are unchanged; the rules validate these exact values. The old preview-session draft key has been rotated so preview responses are not submitted as genuine records.
 6. Run a **dummy submission from the public GitHub Pages URL**. Check in Firebase Console that one document appears at `experiments/social-decision-v1/submissions/{anonymousUid}` and contains 30 trials with 12 emotion scores each. Run an additional test with the same laptop after the success screen: the experiment should obtain a *new* anonymous UID (the app signs out after confirmed submission).
 7. **Verify security rules** with Firebase's Rules Playground/emulator: unauthorized public reads/list queries and updates/deletes must fail, while an authenticated anonymous user can create only a structurally valid document under their own UID. This repository's local tests do **not** replace that live security check.
 8. Remove test records from Firestore using the researcher/admin console before real data collection, as appropriate to your data-management plan.
@@ -36,7 +36,7 @@ You need a Firebase project controlled by the research team. Creating a Firebase
 window.EXPERIMENT_CONFIG = {
   experimentId: 'social-decision-v1',
   experimentVersion: '1.0.0',
-  submissionsEnabled: true,  // only after Authentication & Firestore rules are ready
+  submissionsEnabled: true,  // live pilot; verify the first submission before recruitment
   firebase: {
     apiKey: 'PUBLIC_FIREBASE_WEB_API_KEY',
     authDomain: 'YOUR_PROJECT_ID.firebaseapp.com',
@@ -91,7 +91,7 @@ CSV files and credential files are intentionally excluded by [`.gitignore`](./.g
 | `assets/app.js` | Trial presentation, seeded shuffle, validation, timing, session draft, preview export |
 | `assets/firebase-client.js` | Firestore submission via anonymous Firebase Auth; optional App Check |
 | `data/scenarios.json` | 30 complete independent scenario texts with game and condition metadata |
-| `config.js` | Public Firebase web config; `submissionsEnabled: false` retains preview until safely enabled |
+| `config.js` | Public Firebase web config; `submissionsEnabled: true` currently enables live pilot submissions |
 | `firestore.rules` | Deny-read/deny-update/deny-delete, authenticated create-only rules |
 | `scripts/build_data.py` | Regenerate scenario JSON from the Excel source |
 | `scripts/export_submissions.py` | Authorized Firestore → wide trial-level CSV export |
@@ -99,6 +99,8 @@ CSV files and credential files are intentionally excluded by [`.gitignore`](./.g
 ## Privacy, research ethics, and validity
 
 The form currently asks no name, email or student number. Firebase authentication/service infrastructure can still process technical metadata; configure regional storage, retention and institutional disclosures appropriately. If class credit is involved, keep course completion tracking separate from the response database. Using these responses for academic research may require ethics review, appropriate consent and a data-retention policy; an acknowledgement checkbox about hypothetical scenarios alone is **not** equivalent to informed consent for a research study.
+
+**Safety checkpoint:** Complete at least one test end-to-end and check its record in Firestore. An authenticated anonymous browser may write one document but must fail to read, list, update or delete participant documents. Firebase rules cannot prevent repeat identities or spam; consider App Check and usage alerts before a full study. Remove test submissions using the Firebase owner/admin console before real recruitment.
 
 The experiment uses hypothetical, rather than incentivized, money and sentence lengths. Do not present responses as real economic-game transactions. The randomized order is reproducible from the stored `randomizationSeed`, but repeated browser starts can generate new orders/UIDs; the website does not independently verify one submission per real human.
 

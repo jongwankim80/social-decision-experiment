@@ -1,10 +1,11 @@
 // Firebase Web App config is PUBLIC. Never store Admin credentials or exported responses here.
-// The experiment stays in PREVIEW until Authentication, Firestore and rules are ready,
-// a dummy submission has been verified, and submissionsEnabled is deliberately set to true.
+// Live submissions are enabled for a supervised pilot after the project owner
+// configured Anonymous Authentication, Firestore, and published Security Rules.
+// Do not distribute to students until a real test submission and access test pass.
 window.EXPERIMENT_CONFIG = {
   experimentId: 'social-decision-v1',
   experimentVersion: '1.0.0',
-  submissionsEnabled: false,
+  submissionsEnabled: true,
   firebase: {
     apiKey: 'AIzaSyDJ1tVMIjUUimJcUl-LfWqMCYhO2kJyHL4',
     authDomain: 'social-decision-experiment.firebaseapp.com',

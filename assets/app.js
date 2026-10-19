@@ -1,7 +1,8 @@
 import { saveToFirestore } from './firebase-client.js';
 
 const CONFIG = window.EXPERIMENT_CONFIG || {};
-const STORAGE_KEY = 'emolab-social-decision-v1';
+// Separate live drafts from earlier preview runs so test answers cannot be submitted.
+const STORAGE_KEY = 'emolab-social-decision-v1-live';
 const EMOTIONS = [
   { key: 'excited', label: '신남', low: '전혀 신나지 않음', high: '매우 신남' },
   { key: 'joyful', label: '기쁨', low: '전혀 기쁘지 않음', high: '매우 기쁨' },
