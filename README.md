@@ -4,7 +4,15 @@ An independent, randomized, browser-based class exercise (and a possible startin
 
 **Live site:** https://jongwankim80.github.io/social-decision-experiment/
 
-**Current state: LIVE SUBMISSION SWITCH ON — PILOT TESTING ONLY.** Firebase public config is committed and `submissionsEnabled: true` is set following the project owner's report that Anonymous Authentication and Firestore Rules have been configured. **The live Firebase backend and its deployed security rules have not been independently verified. Do not share the live survey with students until a complete dummy submission appears in Firebase Console and unauthorized reads are confirmed denied.**
+**Current state: LIVE SUBMISSIONS — PILOT / SECURITY VERIFICATION.** The owner has confirmed a dummy response in the Firebase Console. Anonymous Authentication and participant response creation are working, but **unauthorized-read denial and researcher-specific admin read access still require live verification** before formal study rollout.
+
+## 연구자 관리 페이지 / Researcher Console
+
+- **Admin dashboard:** https://jongwankim80.github.io/social-decision-experiment/admin.html
+- **First-time setup:** [ADMIN_SETUP.md](./ADMIN_SETUP.md). Google provider activation and adding your Google Firebase UID to the **published Firestore rules** are required; logging in alone is not enough to read responses.
+- Researchers can review submission counts and download **Excel (.xlsx)** with four sheets (Responses, Participants, Scenarios, Codebook), or a UTF-8 BOM **CSV** containing one row per participant × scenario (30 rows/person, 32 columns).
+- The console never stores service account keys and never uploads raw study responses to the public GitHub repository. The updated [firestore.rules](./firestore.rules) leaves anonymous participant CREATE rules unchanged, denies updates/deletes, and grants read/list only to explicitly allowlisted **Google Firebase UIDs**.
+- A screenshot of a genuine dummy submission in the owner's Firebase Console confirms that Firestore received at least one record. **Admin read permission and blocking of unauthorized reads have not yet been verified live.**
 
 ## What the student sees
 

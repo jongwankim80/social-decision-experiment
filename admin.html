@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex, nofollow" />
+  <meta name="theme-color" content="#f6f8fb" />
+  <title>Researcher Console · Social Decision Experiment</title>
+  <link rel="stylesheet" href="./assets/styles.css" />
+  <link rel="stylesheet" href="./assets/admin.css" />
+  <script src="./config.js" defer></script>
+  <script type="module" src="./assets/admin.js"></script>
+</head>
+<body>
+  <div class="app-shell">
+    <header class="site-header">
+      <div class="site-identity"><span class="brand-mark" aria-hidden="true">E</span><span class="brand-name">EmoLab <span class="brand-divider">/</span> Research Console</span></div>
+      <span class="header-caption">Researchers only</span>
+    </header>
+    <main class="main-content admin-main">
+      <section class="panel admin-panel" aria-labelledby="admin-title">
+        <div class="intro-kicker">RESEARCH DATA · ADMINISTRATOR</div>
+        <h1 id="admin-title">연구자 데이터 관리</h1>
+        <p class="intro-lead">Social Decision Experiment 응답을 확인하고 분석용 엑셀 또는 CSV 파일로 내려받습니다.</p>
+        <div class="admin-notice">
+          <strong>접근 권한 안내</strong>
+          <p>Google 계정으로 로그인하더라도 연구자로 허가된 계정만 응답 데이터에 접근할 수 있습니다. 접근 권한은 Firebase의 Firestore 보안 규칙에서 확인합니다.</p>
+        </div>
+        <div class="admin-auth-actions">
+          <button class="btn btn-primary" type="button" id="admin-login" disabled>Google 계정으로 로그인</button>
+          <button class="btn btn-outline" type="button" id="admin-logout" hidden>로그아웃</button>
+          <span class="admin-auth-state" id="admin-auth-state" aria-live="polite">Firebase 인증을 준비하고 있습니다…</span>
+        </div>
+        <section id="admin-identity" class="admin-identity" hidden aria-label="관리자 계정 정보">
+          <div><span class="admin-small-label">Google 계정</span><strong id="admin-email"></strong></div>
+          <div class="admin-uid-row">
+            <div><span class="admin-small-label">Firebase 관리자 UID (권한 설정용)</span><code id="admin-uid"></code></div>
+            <button class="btn btn-outline admin-small-button" type="button" id="admin-copy-uid">UID 복사</button>
+          </div>
+          <p class="admin-caption">최초 연결 시 이 UID를 Firestore 보안 규칙의 <code>REPLACE_WITH_RESEARCHER_GOOGLE_UID</code> 자리에 지정하고 Publish해야 합니다. UID는 비밀번호가 아닙니다.</p>
+        </section>
+        <div class="admin-divider"></div>
+        <div class="admin-control-bar">
+          <div>
+            <h2>응답 데이터</h2>
+            <p class="admin-caption">관리자 권한을 확인한 후 모든 제출 문서를 읽어 30개 시행 단위로 정리합니다.</p>
+          </div>
+          <button type="button" class="btn btn-primary" id="admin-load" disabled>응답 불러오기</button>
+        </div>
+        <p id="admin-message" class="admin-message" role="status" aria-live="polite">먼저 연구자 Google 계정으로 로그인해 주세요.</p>
+        <div class="admin-summary">
+          <div class="admin-stat"><span>참가자</span><strong id="admin-participants">—</strong></div>
+          <div class="admin-stat"><span>시나리오 응답</span><strong id="admin-trials">—</strong></div>
+          <div class="admin-stat"><span>최근 제출</span><strong class="admin-stat-date" id="admin-newest">—</strong></div>
+        </div>
+        <div class="admin-export-bar">
+          <div class="admin-export-description"><strong>데이터 내보내기</strong><span>엑셀: Responses, Participants, Scenarios, Codebook · CSV: Responses</span></div>
+          <div class="admin-export-buttons">
+            <button type="button" class="btn btn-outline" id="admin-csv" disabled>CSV 다운로드</button>
+            <button type="button" class="btn btn-primary" id="admin-xlsx" disabled>Excel (.xlsx) 다운로드</button>
+          </div>
+        </div>
+        <h2 class="admin-table-title">최근 제출 내역</h2>
+        <div class="admin-table-wrap">
+          <table class="admin-table" aria-label="최근 제출 내역">
+            <thead><tr><th scope="col">참가자 (일부 표시)</th><th scope="col">제출 시각</th><th scope="col">시행 수</th><th scope="col">총 소요 시간</th></tr></thead>
+            <tbody id="admin-recent"><tr><td colspan="4" class="admin-empty">응답을 불러오면 여기에 표시됩니다.</td></tr></tbody>
+          </table>
+        </div>
+        <p class="admin-caption admin-bottom-note">다운로드 파일은 이 브라우저에서만 생성됩니다. 응답은 공개 GitHub 저장소에 업로드되지 않습니다. 파일은 개인정보에 준해 보호하고 테스트 응답은 별도로 정리해 주세요.</p>
+      </section>
+    </main>
+    <footer class="site-footer"><span>EmoLab · Jeonbuk National University</span><span><a href="./">참가자 화면</a></span></footer>
+  </div>
+</body>
+</html>
